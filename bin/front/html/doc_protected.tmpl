@@ -1,10 +1,10 @@
-<div>
-    <a href="/" class="btn btn-outline-dark">Назад</a>
+<div class="bg-light mb-2 p-2">
     <div id="id" data-id={{.Content.Id}}>
-        {{.Content.File}}
+        <a href="/" class="btn btn-outline-dark">Назад</a>
+        <a target="_blank" class="btn btn-outline-dark" rel="noopener noreferrer" href="/open?doc={{.Content.Id}}">Открыть</a>
     </div>
-    <a target="_blank" rel="noopener noreferrer" href="/open?doc={{.Content.Id}}">Открыть</a>
-    {{.Content.Title}}
-    {{.Content.Comment}}
-    {{.Content.Date}}
+    <hr class="my-1">
+    <h5>{{.Content.Title}}</h5>
+    <p>Комментарий: {{.Content.Comment}}</p>
+    <p>Получено: {{.Content.Date.Format "02 Jan 2006, 15:04"}}</p>
 </div>
