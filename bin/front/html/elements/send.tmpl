@@ -1,0 +1,31 @@
+<form id="send_form" action="send" method="post">
+  <input id="send_doc" name="doc" type="hidden" value="">
+  <p class="my-1">E-mail получателей (через запятую)</p>
+  <input name="to" type="text" class="d-block w-50">
+  <p class="my-1">Тема письма</p>
+  <input name="title" type="text" class="d-block w-50">
+  <p class="my-1">Текст письма</p>
+  <textarea name="body" cols="50" rows="10" class="d-block"></textarea>
+  <input type="submit" id="send_submit" value="Отправить" class="d-block my-1 btn btn-outline-dark">
+</form>
+<script>
+    $("#send_form").submit(function(event){
+      event.preventDefault();
+      var data = $("#send_form").serialize();
+      $.ajax({
+        type: 'POST',
+        url: '/send',
+        data: $('#send_form').serialize(),
+        error: function(result,status,xhr) {
+          if (xhr == "Unauthorized") {
+            window.location.replace("/login");
+            return;
+          }
+          handle_error(result.responseText);
+        },
+        success: function(result) {
+          window.location.replace("/");
+        }
+      });
+    });
+</script>

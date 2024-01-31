@@ -1,0 +1,75 @@
+<form id = "redirect_form" action="redirect" method="post">
+    <p class="my-1">Комментарий</p>
+    <textarea name="comment" class="d-block my-1" cols="50" rows="10"></textarea>
+    <button type="button" id="showUsers" class="d-block btn btn-outline-dark my-1">Добавить получателя</button>
+    <ul id="users" class="d-none">
+        {{range .}}
+            <li><button type="button" class="addUser btn btn-outline-dark" data-user="{{.Login}}" data-name="{{.Name}}">{{.Name}}</button></li>
+        {{end}}
+    </ul>
+    <input id="redirect_doc" name="doc" type="hidden" value="">
+    <input id="redirect_user" name="user" type="hidden" value="">
+    
+    <div class="my-3">
+      <p class="d-inline">Получатели: </p>
+      <div class="d-inline" id="userList"></div>
+    </div>
+    
+    <input type="submit" class="btn btn-outline-dark" id="upload_submit" value="Отправить">
+    
+</form>
+<script>
+    $("#showUsers").click(function(){
+        if ($("#users").hasClass("d-none")) {
+            $("#users").removeClass("d-none");
+            $("#users").addClass("d-block");
+        } else {
+            $("#users").addClass("d-none");
+            $("#users").removeClass("d-block");
+        }
+    });
+    $(".addUser").click(function(){
+        var name = $(this).data("name");
+        var user = $(this).data("user");
+        var add = true;
+        if ($("#redirect_user").val() == user) {
+          add = false;
+          return;
+        }
+        $("#userList").children().each(function() {
+          if ($(this).hasClass(user)) {
+            console.log($("#redirect_user").val());
+            add = false;
+            return;
+          }
+        });
+        if (!add) {return;}
+        $("#userList").append('<button type="button" class="btn btn-outline-dark d-inline deleteItself '+user+'">'+name+'<input name="users" type="hidden" value="'+user+'"></button>');
+        upd_elem();
+    });
+    function upd_elem() {
+        $(".deleteItself").click(function(){
+            $(this).remove();
+        });
+    }
+
+    $("#redirect_form").submit(function(event){
+      event.preventDefault();
+      var data = $("#redirect_form").serialize();
+      $.ajax({
+        type: 'POST',
+        url: '/redirect',
+        data: $('#redirect_form').serialize(),
+        error: function(result,status,xhr) {
+          if (xhr == "Unauthorized") {
+            window.location.replace("/login");
+            return;
+          }
+          handle_error(result.responseText);
+        },
+        success: function(result) {
+          window.location.replace("/");
+        }
+      });
+    });
+</script>

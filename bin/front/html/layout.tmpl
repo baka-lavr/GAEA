@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Website</title>
+    <link rel="stylesheet" href="./style.css">
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.2/jquery.min.js" integrity="sha512-tWHlutFnuG0C6nQRlpvrEhE4QpkG1nn2MOUMWmUeRePl4e3Aki0VB6W1v3oLjFtd0hVOtRQ9PHpSfN6u6/QXkQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  </head>
+  <body>
+    <main class="container">
+      <div class="border rounded-2 bg-success p-2">
+        <h1 class="text-white">ЛОКАЛЬНАЯ СИСТЕМА ДОКУМЕНТООБОРОТА</h1>
+        {{if .User}}
+          <div class="row">
+            <div class="col-auto align-middle text-white my-auto" id="my_user" data-id="{{.User.Login}}">{{.User.Name}}</div> 
+            <button class="col-auto btn btn-success border border-white" id="logout" type="button">Выйти</button> 
+          </div>
+        {{end}}
+      </div>
+      <div role="button" id="success" class="d-none bg-info justify-content-between align-items-center row m-0">
+        <div id="success_text" class="col-10"></div>
+        <div id="success_close" class="col-2 text-center">X</div>
+      </div>
+      <div role="button" id="error" class="d-none bg-warning justify-content-between align-items-center row m-0">
+        <div id="error_text" class="col-10"></div>
+        <div id="error_close" class="col-2 text-center">X</div>
+      </div>
+      {{ yield }}
+    </main>
+  </body>
+  <script>
+    function handle_error(err) {
+      $("#error_text").html("Ошибка: "+err);
+      if ($("#error").hasClass("d-none")) {
+        $("#error").removeClass("d-none");
+      }
+    }
+    function handle_success(err) {
+      $("#success_text").html(err);
+      if ($("#success").hasClass("d-none")) {
+        $("#success").removeClass("d-none");
+      }
+    }
+
+    $("#error").click(function(event){
+      if (!$("#error").hasClass("d-none")) {
+        $("#error").addClass("d-none");
+      }
+    });
+    $("#success").click(function(event){
+      if (!$("#success").hasClass("d-none")) {
+        $("#success").addClass("d-none");
+      }
+    });
+
+    $("#logout").click(function(event){
+        $.ajax({
+            type: 'GET',
+            url: '/logout',
+            success: function (result,status,xhr) {
+              window.location.replace("/login");
+            },
+        });
+      });
+  </script>
+</html>

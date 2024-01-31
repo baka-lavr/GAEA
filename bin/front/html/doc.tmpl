@@ -1,0 +1,51 @@
+<div class="bg-light mb-2 p-2">
+    
+    <div id="id" data-id={{.Content.Id}}>
+        <a href="/" class="btn btn-outline-dark">Назад</a>
+        <a target="_blank" class="btn btn-outline-dark" rel="noopener noreferrer" href="/open?doc={{.Content.Id}}">Открыть</a>
+        <button id="redirect_button" class="btn btn-outline-dark">Переслать</button>
+        <button id="send_button" class="btn btn-outline-dark">Отправить по почте</button>
+    </div>
+    <hr class="my-1">
+    <h5>{{.Content.Title}}</h5>
+    <p>Комментарий: {{.Content.Comment}}</p>
+    <p>Получено: {{.Content.Date.Format "02 Jan 2006, 15:04"}}</p>
+    <hr class="my-1">
+    <div id="send">
+
+    </div>
+</div>
+<script>
+    $("#redirect_button").click(function(event){
+        $.ajax({
+            type: 'GET',
+            url: '/redirect_form',
+            error: function(result,status,xhr) {
+                if (xhr == "Unauthorized") {
+                    window.location.replace("/login");
+                }
+            },
+            success: function(result) {
+                $("#send").html(result);
+                $("#redirect_doc").val($("#id").data("id"));
+                $("#redirect_user").val($("#my_user").data("id"));
+            }
+        });
+    });
+    $("#send_button").click(function(event){
+        $.ajax({
+            type: 'GET',
+            url: '/send_form',
+            error: function(result,status,xhr) {
+                if (xhr == "Unauthorized") {
+                    window.location.replace("/login");
+                }
+            },
+            success: function(result) {
+                $("#send").html(result);
+                $("#send_doc").val($("#id").data("id"));
+                //$("#redirect_user").val($("#my_user").data("id"));
+            }
+        });
+    });
+</script>

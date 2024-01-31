@@ -1,0 +1,30 @@
+<div class="bg-light ps-2 pb-1 mt-3 rounded-top">
+  <h4>
+    Вход в учетную запись
+  </h4>
+  <hr class="my-1">
+  <form id="loginform" action="login_attempt" method="post">
+    <p class="my-1">Логин</p>
+    <input type="text" name="login" class="d-block">
+    <p class="my-1">Пароль</p>
+    <input type="password" name="password" class="d-block mb-1">
+    <input type="submit" value="LOGIN" id="submit" class="d-block btn btn-outline-dark"/>
+  </form>
+  <script>
+    $("#loginform").submit(function(event){
+      event.preventDefault();
+      $.ajax({
+        type: 'POST',
+        url: 'login_attempt',
+        dataType: 'text',
+        data: $('#loginform').serialize(),
+        success: function(result) {
+          window.location.replace("/");
+        },
+        error: function(result) {
+          handle_error("Неверные логин или пароль");
+        }
+      })
+    });
+  </script>
+</div>

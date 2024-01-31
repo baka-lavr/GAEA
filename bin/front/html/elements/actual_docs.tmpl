@@ -1,0 +1,14 @@
+<div>
+    {{range .}}
+        <a href="/document/{{.Id}}" class="btn btn-outline-dark d-block">
+            <div class="text-start">
+                <h5>{{.Title}}</h5>
+                <p class="mb-1">Комментарий: {{.Comment}}</p>
+                {{if .Parent}}
+                    <p class="mb-1">Получено от: {{.ParentName}}</p>
+                {{end}}
+                <p class="mb-1">Дата получения: {{.Date.Format "02 Jan 2006, 15:04"}}</p>
+            </div>
+        </a>
+    {{end}}
+</div>

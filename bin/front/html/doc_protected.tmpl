@@ -1,0 +1,10 @@
+<div>
+    <a href="/" class="btn btn-outline-dark">Назад</a>
+    <div id="id" data-id={{.Content.Id}}>
+        {{.Content.File}}
+    </div>
+    <a target="_blank" rel="noopener noreferrer" href="/open?doc={{.Content.Id}}">Открыть</a>
+    {{.Content.Title}}
+    {{.Content.Comment}}
+    {{.Content.Date}}
+</div>
