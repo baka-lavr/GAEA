@@ -9,7 +9,9 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"context"
 	"os"
-	"os/signal"
+	//"syscall"
+	"path/filepath"
+	//"os/signal"
 	"github.com/unrolled/render"
 	"github.com/kardianos/service"
 )
@@ -40,11 +42,20 @@ func (c *Controller) Start(s service.Service) error {
 }
 
 func (c *Controller) Stop(s service.Service) error {
+	c.db.Close()
+	c.mail.Client.Close()
+	c.server.Shutdown(context.Background())
 	return nil
 }
 
 func (c *Controller) run() {
-	file, err := os.Open("conf.json")
+	exe,err := os.Executable()
+	if err != nil {
+		logger.Error(err)
+		log.Fatal(err)
+	}
+	path := filepath.Dir(exe)
+	file, err := os.Open(filepath.Join(path,"conf.json"))
 	defer file.Close()
 	if err != nil {
 		logger.Error(err)
@@ -89,17 +100,9 @@ func (c *Controller) run() {
 	})
 	c.render = *render
 
-	go func() {
-		sig := make(chan os.Signal, 1)
-		signal.Notify(sig, os.Interrupt)
-		<- sig
-		c.db.Close()
-		c.mail.Client.Close()
-		c.server.Shutdown(context.Background())
-	}()
 	if err := c.server.ListenAndServe(); err != nil {
 		logger.Error(err)
-	}
+	}	
 }
 
 func main() {
@@ -121,4 +124,6 @@ func main() {
 	if err != nil {
 		logger.Error(err)
 	}
+
+	
 }
