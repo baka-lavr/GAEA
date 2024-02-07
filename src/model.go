@@ -94,7 +94,9 @@ func (c *Controller) UploadDoc(w http.ResponseWriter, r *http.Request, _ httprou
 	}
 	defer file.Close()
 	name := fmt.Sprintf("%d%s",time.Now().UnixNano(),filepath.Ext(header.Filename))
-	dest,err := os.Create(fmt.Sprintf("./db/docs/%s",name))
+	exe,_ := os.Executable()
+	ospath := filepath.Dir(exe)
+	dest,err := os.Create(filepath.Join(ospath,"db","docs",name))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logger.Error(err)
@@ -112,7 +114,7 @@ func (c *Controller) UploadDoc(w http.ResponseWriter, r *http.Request, _ httprou
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logger.Error(err)
-		os.Remove(fmt.Sprintf("./db/docs/%s",name))
+		os.Remove(filepath.Join(ospath,"db","docs",name))
 		return
 	}
 	fmt.Fprintf(w,"Загрузка успешна")
@@ -146,7 +148,9 @@ func (c *Controller) Send(w http.ResponseWriter, r *http.Request, _ httprouter.P
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logger.Error(err)
 	}
-	path := fmt.Sprintf("./db/docs/%s",doc.File)
+	exe,_ := os.Executable()
+	ospath := filepath.Dir(exe)
+	path := filepath.Join(ospath,"db","docs",doc.File)
 	err = c.mail.Send(title,body,path,to)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

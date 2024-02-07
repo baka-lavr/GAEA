@@ -10,11 +10,20 @@ import (
 	"github.com/julienschmidt/httprouter"
 	_"github.com/unrolled/render"
 	"html/template"
+	"path/filepath"
+	"os"
 )
 
 type Filler struct {
 	User db.User
 	Content interface{}
+}
+
+func (c *Controller) ParseElement(name string) (*template.Template, error) {
+	exe,_ := os.Executable()
+	os := filepath.Dir(exe)
+	tmpl, err := template.ParseFiles(filepath.Join(os,"front","html","elements",name))
+	return tmpl, err
 }
 
 func (c *Controller) View(w http.ResponseWriter, r *http.Request, page string, content interface{}) {
@@ -64,7 +73,8 @@ func (c *Controller) ActualDocs(w http.ResponseWriter, r *http.Request, _ httpro
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logger.Error(err)
 	}
-	tmpl, err := template.ParseFiles("front/html/elements/actual_docs.tmpl")
+	tmpl, err := c.ParseElement("actual_docs.tmpl")
+	
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logger.Error(err)
@@ -78,7 +88,7 @@ func (c *Controller) HeadDocs(w http.ResponseWriter, r *http.Request, _ httprout
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logger.Error(err)
 	}
-	tmpl, err := template.ParseFiles("front/html/elements/head_docs.tmpl")
+	tmpl, err := c.ParseElement("head_docs.tmpl")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logger.Error(err)
@@ -92,7 +102,7 @@ func (c *Controller) HeadArchive(w http.ResponseWriter, r *http.Request, _ httpr
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logger.Error(err)
 	}
-	tmpl, err := template.ParseFiles("front/html/elements/head_docs.tmpl")
+	tmpl, err := c.ParseElement("head_docs.tmpl")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logger.Error(err)
@@ -106,7 +116,7 @@ func (c *Controller) FormRedirect(w http.ResponseWriter, r *http.Request, _ http
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logger.Error(err)
 	}
-	tmpl, err := template.ParseFiles("front/html/elements/redirect.tmpl")
+	tmpl, err := c.ParseElement("redirect.tmpl")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logger.Error(err)
@@ -115,7 +125,7 @@ func (c *Controller) FormRedirect(w http.ResponseWriter, r *http.Request, _ http
 }
 
 func (c *Controller) FormSend(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	tmpl, err := template.ParseFiles("front/html/elements/send.tmpl")
+	tmpl, err := c.ParseElement("send.tmpl")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logger.Error(err)
@@ -144,9 +154,13 @@ func (c *Controller) GetFile(w http.ResponseWriter, r *http.Request, _ httproute
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logger.Error(err)
 	}
+
+	exe,_ := os.Executable()
+	os := filepath.Dir(exe)
+
 	//w.Header().Set("filename", path.File)
 	w.Header().Set("Content-Disposition", fmt.Sprintf("inline; filename=%s",path.File))
-	http.ServeFile(w,r,fmt.Sprintf("./db/docs/%s",path.File))
+	http.ServeFile(w,r,filepath.Join(os,"db","docs",path.File))
 	//file, err := ioutil.ReadFile(fmt.Sprintf("./db/docs/%s",path.File))
 	//if err != nil {
 	//	http.Error(w, err.Error(), http.StatusInternalServerError)

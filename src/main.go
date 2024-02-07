@@ -95,7 +95,7 @@ func (c *Controller) run() {
 	c.server = server
 
 	render := render.New(render.Options{
-		Directory: "front/html",
+		Directory: filepath.Join(path,"front","html"),
 		Layout: "layout",
 	})
 	c.render = *render
