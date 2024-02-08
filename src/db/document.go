@@ -49,6 +49,7 @@ func (db Database) GetDocs(user string, archive bool) ([]Document,error) {
 		loc,err := time.LoadLocation("Europe/Moscow")
 		if err == nil {
 			res[i].Date = res[i].Date.In(loc)
+			//logger.Info(res[i].Date.In(loc))
 		}
 		
 		res[i].Id = j.Objid.(primitive.ObjectID).Hex()

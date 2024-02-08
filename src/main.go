@@ -14,6 +14,7 @@ import (
 	//"os/signal"
 	"github.com/unrolled/render"
 	"github.com/kardianos/service"
+	_"time/tzdata"
 )
 
 var logger service.Logger
