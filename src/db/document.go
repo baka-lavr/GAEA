@@ -46,6 +46,11 @@ func (db Database) GetDocs(user string, archive bool) ([]Document,error) {
 	}
 	err = cursor.All(ctx,&res)
 	for i,j := range res {
+		loc,err := time.LoadLocation("Europe/Moscow")
+		if err == nil {
+			res[i].Date = res[i].Date.In(loc)
+		}
+		
 		res[i].Id = j.Objid.(primitive.ObjectID).Hex()
 		if j.Parent != "" {
 			parent,err := db.GetDocByID(j.Parent,false,"")
@@ -65,14 +70,19 @@ func (db Database) GetAllDocs(archive bool) ([]Document,error) {
 	collection := db.connection.Database(db.name).Collection("documents")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	filter := bson.D{bson.E{"archive",archive},bson.E{"parent",""}}
+	filter := bson.D{bson.E{"archive",archive},bson.E{"child",nil},bson.E{"parent",bson.D{{"$ne",""}}}}
 	cursor, err := collection.Find(ctx,filter)
 	if err != nil {
 		return nil,err
 	}
 	err = cursor.All(ctx,&res)
 	for i,j := range res {
+		loc,err := time.LoadLocation("Europe/Moscow")
+		if err == nil {
+			res[i].Date = res[i].Date.In(loc)
+		}
 		res[i].Id = j.Objid.(primitive.ObjectID).Hex()
+		
 		usr, err := db.GetUser(j.User)
 		if err == nil {
 			res[i].ParentName = usr.Name
@@ -97,8 +107,20 @@ func (db Database) GetDocByID(id string, protected bool, user string) (Document,
 	if protected && res.User != user {
 		return res, errors.New("Access denied")
 	}
-	
+	loc,err := time.LoadLocation("Europe/Moscow")
+	if err == nil {
+		res.Date = res.Date.In(loc)
+	}
 	res.Id = res.Objid.(primitive.ObjectID).Hex()
+	if res.Parent != "" {
+		parent,err := db.GetDocByID(res.Parent,false,"")
+		if err == nil {
+			p_usr, err := db.GetUser(parent.User)
+			if err == nil {
+				res.ParentName = p_usr.Name
+			}
+		}
+	}
 	return res,nil
 }
 

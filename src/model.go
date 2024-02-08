@@ -109,7 +109,7 @@ func (c *Controller) UploadDoc(w http.ResponseWriter, r *http.Request, _ httprou
 		logger.Error(err)
 		return
 	}
-	doc := db.Document{File:name,User:r.Context().Value("user").(db.User).Login,Title:title,Comment:comment,Date:time.Now()}
+	doc := db.Document{File:name,User:r.Context().Value("user").(db.User).Login,Title:title,Comment:comment,Date:time.Now().UTC()}
 	err = c.db.CreateDoc(doc)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -147,6 +147,7 @@ func (c *Controller) Send(w http.ResponseWriter, r *http.Request, _ httprouter.P
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logger.Error(err)
+		return
 	}
 	exe,_ := os.Executable()
 	ospath := filepath.Dir(exe)
@@ -155,6 +156,7 @@ func (c *Controller) Send(w http.ResponseWriter, r *http.Request, _ httprouter.P
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logger.Error(err)
+		return
 	}
 	err = c.db.Archiving(doc.Id)
 	if err != nil {
