@@ -11,6 +11,13 @@
     <p>Комментарий: {{.Content.Comment}}</p>
     <p>Получено: {{.Content.Date.Format "02 Jan 2006, 15:04"}} {{if .Content.Parent}} от {{.Content.ParentName}}{{end}}</p>
     <hr class="my-1">
+    <h4>Прикрепленные файлы</h4>
+    <hr class="my-1">
+    <div>
+        {{range $i, $a := .Content.Files}}
+        <a target="_blank" class="btn btn-outline-dark" rel="noopener noreferrer" href="/open?doc={{$.Content.Id}}&number={{$i}}">{{$a}}</a>
+        {{end}}
+    </div>  
     <div id="send">
 
     </div>

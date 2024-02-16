@@ -58,7 +58,7 @@ func (m *MailConnection) Reconnect() error {
 	return err
 }
 
-func (m *MailConnection) Send(title,body,path string, to []string) error {
+func (m *MailConnection) Send(title,body string,paths []string, to []string) error {
 	if m.Client.Noop() != nil {
 		//log.Print("Mail: trying to reconnect")
 		logger.Info("Mail: trying to reconnect")
@@ -73,8 +73,10 @@ func (m *MailConnection) Send(title,body,path string, to []string) error {
 	email := mail.NewMSG()
 	email.SetFrom(m.Config.from).AddTo(to...).SetSubject(title)
 	email.SetBody(mail.TextHTML, body)
-	file := &mail.File{FilePath: path}
-	email.Attach(file)
+	for _,j := range paths {
+		file := &mail.File{FilePath: j}
+		email.Attach(file)
+	}
 	if email.Error != nil {
 		return email.Error
 	}

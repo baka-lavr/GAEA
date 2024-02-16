@@ -14,7 +14,7 @@ type Document struct {
 	Id string `bson:"-"`
 	ParentName string `bson:"-"`
 	Objid interface{} `bson:"_id,omitempty"`
-	File string
+	Files []string
 	User string
 	Title string
 	Comment string
@@ -150,7 +150,7 @@ func (db Database) Redirect(user,doc,comment string, users []string) error {
 	collection := db.connection.Database(db.name).Collection("documents")
 	for _,j := range users {
 		
-		doc := Document{File:old.File,Title:old.Title,User:j,Comment:comment,Date:time.Now(),Parent:old.Id}
+		doc := Document{Files:old.Files,Title:old.Title,User:j,Comment:comment,Date:time.Now(),Parent:old.Id}
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 		id,err := collection.InsertOne(ctx,doc)

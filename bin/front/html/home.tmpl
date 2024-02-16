@@ -12,6 +12,10 @@
         <textarea name="comment" class="d-block mb-1" cols="50" rows="10"></textarea>
       </label>
       <input type="file" name="document" class="btn btn-outline-dark d-block mb-1">
+      <div id="dop_files">
+        
+      </div>
+      <button id="add_file" type="button" class="btn btn-outline-dark d-block">Дополнительный файл</button>
       <input type="submit" id="upload_submit" value="Загрузить" class="btn btn-outline-dark d-block">
     </form>
   </div>
@@ -54,6 +58,17 @@
   
 
   <script>
+    $("#add_file").click(function(event){
+      $("#dop_files").append('<div class="d-block"><input type="file" name="document" class="btn btn-outline-dark mb-1"><button type="button" class="file_delete btn btn-outline-dark">X</button></div>');
+      handle_docs();
+    });
+    function handle_docs() {
+      $(".file_delete").click(function(){
+        $(this).parent().remove();
+      });
+    }
+
+
     $(document).ready(function(){
       loadDocs("/actual_docs","mydocs");
       loadDocs("/head_docs","headdocs");
@@ -62,6 +77,17 @@
 
     $("#upload_form").submit(function(event){
       event.preventDefault();
+      var reject = false;
+      $("#upload_form").find("input").each(function(i,j){
+        if ($(this).val() == '') {
+          reject = true;
+        }
+      });
+      if (reject == true) {
+        handle_error("Не введены данные");
+        return;
+      }
+      
       var data = new FormData($("#upload_form")[0])
       $.ajax({
         type: 'POST',

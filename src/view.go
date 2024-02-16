@@ -12,6 +12,7 @@ import (
 	"html/template"
 	"path/filepath"
 	"os"
+	"strconv"
 )
 
 type Filler struct {
@@ -136,6 +137,7 @@ func (c *Controller) FormSend(w http.ResponseWriter, r *http.Request, _ httprout
 func (c *Controller) GetFile(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	user := r.Context().Value("user").(db.User)
 	doc := r.URL.Query().Get("doc")
+	number,_ := strconv.Atoi(r.URL.Query().Get("number"))
 	admin := false
 	for _,j := range user.Roles {
 		if j == "admin" {
@@ -159,8 +161,8 @@ func (c *Controller) GetFile(w http.ResponseWriter, r *http.Request, _ httproute
 	os := filepath.Dir(exe)
 
 	//w.Header().Set("filename", path.File)
-	w.Header().Set("Content-Disposition", fmt.Sprintf("inline; filename=%s",path.File))
-	http.ServeFile(w,r,filepath.Join(os,"db","docs",path.File))
+	w.Header().Set("Content-Disposition", fmt.Sprintf("inline; filename=%s",path.Files[number]))
+	http.ServeFile(w,r,filepath.Join(os,"db","docs",path.Files[number]))
 	//file, err := ioutil.ReadFile(fmt.Sprintf("./db/docs/%s",path.File))
 	//if err != nil {
 	//	http.Error(w, err.Error(), http.StatusInternalServerError)

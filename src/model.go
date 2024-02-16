@@ -83,38 +83,74 @@ func (c *Controller) UploadDoc(w http.ResponseWriter, r *http.Request, _ httprou
 	const MAX_FILE_SIZE = 1024*1024
 	title := r.FormValue("title")
 	comment := r.FormValue("comment")
+	files := make([]string,0)
 	if err := r.ParseMultipartForm(MAX_FILE_SIZE); err != nil {
 		http.Error(w, "Слишком большой файл", http.StatusBadRequest)
 		return
 	}
-	file,header,err := r.FormFile("document")
-	if err != nil {
-		http.Error(w, "Ошибка загрузки файла", http.StatusBadRequest)
-		return
+
+	fs := r.MultipartForm.File["document"]
+	for _,header := range fs {
+		file, err := header.Open()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			logger.Error(err)
+			return
+		}
+		defer file.Close()
+		logger.Info(header.Filename)
+		name := fmt.Sprintf("%s%d%s",header.Filename[:len(header.Filename)-len(filepath.Ext(header.Filename))],time.Now().UnixNano(),filepath.Ext(header.Filename))
+		exe,_ := os.Executable()
+		ospath := filepath.Dir(exe)
+		dest,err := os.Create(filepath.Join(ospath,"db","docs",name))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			logger.Error(err)
+			return
+		}
+		defer dest.Close()
+		_,err = io.Copy(dest, file)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			logger.Error(err)
+			return
+		}
+		files = append(files, name)
 	}
-	defer file.Close()
-	name := fmt.Sprintf("%d%s",time.Now().UnixNano(),filepath.Ext(header.Filename))
+	
+
+	//file,header,err := r.FormFile("document")
+	//if err != nil {
+	//	http.Error(w, "Ошибка загрузки файла", http.StatusBadRequest)
+	//	return
+	//}
+	//defer file.Close()
+	//name := fmt.Sprintf("%d%s",time.Now().UnixNano(),filepath.Ext(header.Filename))
+	//exe,_ := os.Executable()
+	//ospath := filepath.Dir(exe)
+	//dest,err := os.Create(filepath.Join(ospath,"db","docs",name))
+	//if err != nil {
+	//	http.Error(w, err.Error(), http.StatusInternalServerError)
+	//	logger.Error(err)
+	//	return
+	//}
+	//defer dest.Close()
+	//_,err = io.Copy(dest, file)
+	//if err != nil {
+	//	http.Error(w, err.Error(), http.StatusInternalServerError)
+	//	logger.Error(err)
+	//	return
+	//}
 	exe,_ := os.Executable()
 	ospath := filepath.Dir(exe)
-	dest,err := os.Create(filepath.Join(ospath,"db","docs",name))
+	doc := db.Document{Files:files,User:r.Context().Value("user").(db.User).Login,Title:title,Comment:comment,Date:time.Now().UTC()}
+	err := c.db.CreateDoc(doc)
 	if err != nil {
+		for _,name := range files {
+			os.Remove(filepath.Join(ospath,"db","docs",name))
+		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logger.Error(err)
-		return
-	}
-	defer dest.Close()
-	_,err = io.Copy(dest, file)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logger.Error(err)
-		return
-	}
-	doc := db.Document{File:name,User:r.Context().Value("user").(db.User).Login,Title:title,Comment:comment,Date:time.Now().UTC()}
-	err = c.db.CreateDoc(doc)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logger.Error(err)
-		os.Remove(filepath.Join(ospath,"db","docs",name))
 		return
 	}
 	fmt.Fprintf(w,"Загрузка успешна")
@@ -151,8 +187,11 @@ func (c *Controller) Send(w http.ResponseWriter, r *http.Request, _ httprouter.P
 	}
 	exe,_ := os.Executable()
 	ospath := filepath.Dir(exe)
-	path := filepath.Join(ospath,"db","docs",doc.File)
-	err = c.mail.Send(title,body,path,to)
+	paths := make([]string,0)
+	for _,j := range doc.Files{
+		paths = append(paths,filepath.Join(ospath,"db","docs",j))
+	}
+	err = c.mail.Send(title,body,paths,to)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logger.Error(err)
