@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/xhit/go-simple-mail/v2"
 	"time"
-	_"log"
+	"log"
 )
 
 type MailConfig struct {
@@ -52,20 +52,20 @@ func (m *MailConnection) Reconnect() error {
 	m.Client = client
 	err := m.Client.Noop()
 	if err != nil {
-		//log.Print(err)
-		logger.Error(err)
+		log.Print(err)
+		//logger.Error(err)
 	}
 	return err
 }
 
 func (m *MailConnection) Send(title,body string,paths []string, to []string) error {
 	if m.Client.Noop() != nil {
-		//log.Print("Mail: trying to reconnect")
-		logger.Info("Mail: trying to reconnect")
+		log.Print("Mail: trying to reconnect")
+		//logger.Info("Mail: trying to reconnect")
 		err := m.Reconnect()
 		if err != nil {
-			//log.Print("Mail: cannot reconnect")
-			logger.Info("Mail: cannot reconnect")
+			log.Print("Mail: cannot reconnect")
+			//logger.Info("Mail: cannot reconnect")
 			return err
 		}
 	}

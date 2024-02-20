@@ -11,7 +11,7 @@ import (
 	"net/http"
 	"encoding/json"
 	"github.com/julienschmidt/httprouter"
-	_"log"
+	"log"
 )
 
 func (a *Auth) LoginAttempt(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -94,25 +94,28 @@ func (c *Controller) UploadDoc(w http.ResponseWriter, r *http.Request, _ httprou
 		file, err := header.Open()
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			logger.Error(err)
+			log.Print(err)
+			//logger.Error(err)
 			return
 		}
 		defer file.Close()
-		logger.Info(header.Filename)
+		//logger.Info(header.Filename)
 		name := fmt.Sprintf("%s%d%s",header.Filename[:len(header.Filename)-len(filepath.Ext(header.Filename))],time.Now().UnixNano(),filepath.Ext(header.Filename))
 		exe,_ := os.Executable()
 		ospath := filepath.Dir(exe)
 		dest,err := os.Create(filepath.Join(ospath,"db","docs",name))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			logger.Error(err)
+			log.Print(err)
+			//ogger.Error(err)
 			return
 		}
 		defer dest.Close()
 		_,err = io.Copy(dest, file)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			logger.Error(err)
+			log.Print(err)
+			//logger.Error(err)
 			return
 		}
 		files = append(files, name)
@@ -150,7 +153,8 @@ func (c *Controller) UploadDoc(w http.ResponseWriter, r *http.Request, _ httprou
 			os.Remove(filepath.Join(ospath,"db","docs",name))
 		}
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logger.Error(err)
+		log.Print(err)
+		//logger.Error(err)
 		return
 	}
 	fmt.Fprintf(w,"Загрузка успешна")
@@ -169,7 +173,8 @@ func (c *Controller) Redirect(w http.ResponseWriter, r *http.Request, _ httprout
 	err := c.db.Redirect(user.Login,doc,comment,users)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logger.Error(err)
+		log.Print(err)
+		//logger.Error(err)
 	}
 }
 
@@ -182,7 +187,8 @@ func (c *Controller) Send(w http.ResponseWriter, r *http.Request, _ httprouter.P
 	doc,err := c.db.GetDocByID(r.FormValue("doc"), true, user)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logger.Error(err)
+		log.Print(err)
+		//logger.Error(err)
 		return
 	}
 	exe,_ := os.Executable()
@@ -194,12 +200,14 @@ func (c *Controller) Send(w http.ResponseWriter, r *http.Request, _ httprouter.P
 	err = c.mail.Send(title,body,paths,to)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logger.Error(err)
+		log.Print(err)
+		//logger.Error(err)
 		return
 	}
 	err = c.db.Archiving(doc.Id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logger.Error(err)
+		log.Print(err)
+		//logger.Error(err)
 	}
 }

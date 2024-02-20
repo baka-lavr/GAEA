@@ -72,13 +72,15 @@ func (c *Controller) ActualDocs(w http.ResponseWriter, r *http.Request, _ httpro
 	docs, err := c.db.GetDocs(r.Context().Value("user").(db.User).Login,false)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logger.Error(err)
+		log.Print(err)
+		//logger.Error(err)
 	}
 	tmpl, err := c.ParseElement("actual_docs.tmpl")
 	
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logger.Error(err)
+		log.Print(err)
+		//logger.Error(err)
 	}
 	tmpl.Execute(w,docs)
 }
@@ -87,12 +89,14 @@ func (c *Controller) HeadDocs(w http.ResponseWriter, r *http.Request, _ httprout
 	docs, err := c.db.GetAllDocs(false)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logger.Error(err)
+		log.Print(err)
+		//logger.Error(err)
 	}
 	tmpl, err := c.ParseElement("head_docs.tmpl")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logger.Error(err)
+		log.Print(err)
+		//logger.Error(err)
 	}
 	tmpl.Execute(w,docs)
 }
@@ -101,12 +105,14 @@ func (c *Controller) HeadArchive(w http.ResponseWriter, r *http.Request, _ httpr
 	docs, err := c.db.GetAllDocs(true)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logger.Error(err)
+		log.Print(err)
+		//logger.Error(err)
 	}
 	tmpl, err := c.ParseElement("head_docs.tmpl")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logger.Error(err)
+		log.Print(err)
+		//logger.Error(err)
 	}
 	tmpl.Execute(w,docs)
 }
@@ -115,12 +121,14 @@ func (c *Controller) FormRedirect(w http.ResponseWriter, r *http.Request, _ http
 	users, err := c.db.GetUserList()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logger.Error(err)
+		log.Print(err)
+		//logger.Error(err)
 	}
 	tmpl, err := c.ParseElement("redirect.tmpl")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logger.Error(err)
+		log.Print(err)
+		//logger.Error(err)
 	}
 	tmpl.Execute(w,users)
 }
@@ -129,7 +137,8 @@ func (c *Controller) FormSend(w http.ResponseWriter, r *http.Request, _ httprout
 	tmpl, err := c.ParseElement("send.tmpl")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logger.Error(err)
+		log.Print(err)
+		//logger.Error(err)
 	}
 	tmpl.Execute(w,nil)
 }
@@ -154,7 +163,8 @@ func (c *Controller) GetFile(w http.ResponseWriter, r *http.Request, _ httproute
 	
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logger.Error(err)
+		log.Print(err)
+		//logger.Error(err)
 	}
 
 	exe,_ := os.Executable()

@@ -17,7 +17,7 @@ import (
 	_"time/tzdata"
 )
 
-var logger service.Logger
+//var logger service.Logger
 
 type Configuration struct {
 	DBName string
@@ -52,27 +52,27 @@ func (c *Controller) Stop(s service.Service) error {
 func (c *Controller) run() {
 	exe,err := os.Executable()
 	if err != nil {
-		logger.Error(err)
+		//logger.Error(err)
 		log.Fatal(err)
 	}
 	path := filepath.Dir(exe)
 	file, err := os.Open(filepath.Join(path,"conf.json"))
 	defer file.Close()
 	if err != nil {
-		logger.Error(err)
+		//logger.Error(err)
 		log.Fatal(err)
 	}
 	decoder := json.NewDecoder(file)
 	conf := Configuration{}
 	err = decoder.Decode(&conf)
 	if err != nil {
-		logger.Error(err)
+		//logger.Error(err)
 		log.Fatal(err)
 	}
 
 	mail_con, err := MailConnect(conf)
 	if err != nil {
-		logger.Error(err)
+		//logger.Error(err)
 		log.Fatal(err)
 	}
 	c.mail = &mail_con
@@ -80,10 +80,11 @@ func (c *Controller) run() {
 	db, err := db.OpenDB(conf.DBName,conf.DBUser,conf.DBPass)
 	defer db.Close()
 	if err != nil {
-		logger.Error(err)
+		//logger.Error(err)
 		log.Fatal(err)
 	}
-	logger.Info("DataBase pinged")
+	log.Print("DataBase pinged")
+	//logger.Info("DataBase pinged")
 	c.db = db
 	
 	router := httprouter.New()
@@ -102,7 +103,8 @@ func (c *Controller) run() {
 	c.render = *render
 
 	if err := c.server.ListenAndServe(); err != nil {
-		logger.Error(err)
+		log.Fatal(err)
+		//logger.Error(err)
 	}	
 }
 
@@ -117,13 +119,13 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	logger, err = svc.Logger(nil)
-	if err != nil {
-		log.Fatal(err)
-	}
+	//logger, err = svc.Logger(nil)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
 	err = svc.Run()
 	if err != nil {
-		logger.Error(err)
+		//logger.Error(err)
 	}
 
 	
