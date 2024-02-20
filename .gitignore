@@ -1,2 +1,4 @@
 /bin/db/docs/*
 /bin/conf.json
+/bin/src
+/bin/src.exe
