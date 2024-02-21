@@ -20,6 +20,8 @@ import (
 //var logger service.Logger
 
 type Configuration struct {
+	DBIp string
+	DBPort int
 	DBName string
 	DBUser string
 	DBPass string
@@ -77,7 +79,7 @@ func (c *Controller) run() {
 	}
 	c.mail = &mail_con
 
-	db, err := db.OpenDB(conf.DBName,conf.DBUser,conf.DBPass)
+	db, err := db.OpenDB(conf.DBIp,conf.DBPort,conf.DBName,conf.DBUser,conf.DBPass)
 	defer db.Close()
 	if err != nil {
 		//logger.Error(err)

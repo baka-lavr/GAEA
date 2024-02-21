@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"time"
+	"fmt"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -14,12 +15,12 @@ type Database struct {
 	connection *mongo.Client
 }
 
-func OpenDB(name,user,pass string) (Database, error) {
+func OpenDB(ip string,port int,name,user,pass string) (Database, error) {
 	cred := options.Credential{
 		Username: user,
 		Password: pass,
 	}
-	opt := options.Client().ApplyURI("mongodb://localhost:27017").SetAuth(cred)
+	opt := options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%d",ip,port)).SetAuth(cred)
 	context, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 	client,err := mongo.Connect(context, opt)
