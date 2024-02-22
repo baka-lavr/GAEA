@@ -10,6 +10,11 @@ import (
 	"errors"
 ) 
 
+type Tag struct {
+	Id string
+	Name string
+}
+
 type Document struct {
 	Id string `bson:"-"`
 	ParentName string `bson:"-"`
@@ -22,6 +27,21 @@ type Document struct {
 	Parent string
 	Child []string
 	Archive bool
+	Tags []string
+}
+
+func (db Database) GetTags() ([]Tag,error) {
+	var res []Tag
+	collection := db.connection.Database(db.name).Collection("tags")
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	filter := bson.D{}
+	cursor, err := collection.Find(ctx,filter)
+	if err != nil {
+		return nil,err
+	}
+	err = cursor.All(ctx,&res)
+	return res,err
 }
 
 func (db Database) CreateDoc(doc Document) error {
@@ -34,12 +54,15 @@ func (db Database) CreateDoc(doc Document) error {
 	return err
 }
 
-func (db Database) GetDocs(user string, archive bool) ([]Document,error) {
+func (db Database) GetDocs(user string, archive bool, tag string) ([]Document,error) {
 	var res []Document
 	collection := db.connection.Database(db.name).Collection("documents")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	filter := bson.D{bson.E{"user",user},bson.E{"archive",archive}}
+	if tag != "" {
+		filter = bson.D{bson.E{"user",user},bson.E{"archive",archive},bson.E{"tags",tag}}
+	}
 	cursor, err := collection.Find(ctx,filter)
 	if err != nil {
 		return nil,err
