@@ -20,6 +20,7 @@ func Routing(router *httprouter.Router, c *Controller) Auth {
 	auth.GET("/redirect_form","user",c.FormRedirect)
 	auth.POST("/redirect","user",c.Redirect)
 	auth.POST("/send","user",c.Send)
+	auth.GET("/tags","user",c.TagList)
 	auth.GET("/actual_docs","user",c.ActualDocs)
 	auth.GET("/head_docs","head",c.HeadDocs)
 	auth.GET("/head_archive","head",c.HeadArchive)

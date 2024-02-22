@@ -180,3 +180,19 @@ func (c *Controller) GetFile(w http.ResponseWriter, r *http.Request, _ httproute
 	//w.Header().Set("Content-Type","application/octet-stream")
 	//w.Write(file)
 }
+
+func (c *Controller) TagList(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	tags, err := c.db.GetTags()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Print(err)
+	}
+	tmpl, err := c.ParseElement("tags.tmpl")
+	
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Print(err)
+		//logger.Error(err)
+	}
+	tmpl.Execute(w,tags)
+}
