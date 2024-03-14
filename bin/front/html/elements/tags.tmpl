@@ -1,6 +1,6 @@
 <div>
-    {{range .}}
-        <button onclick="loadDocs('/actual_docs','mydocs');" class="btn btn-outline-dark d-block">
+    {{range .Tags}}
+        <button onclick="loadDocs('/{{$.URL}}?tag={{.Id}}','{{$.Id}}');" class="btn btn-outline-dark d-block">
             {{.Name}}
         </button>
     {{end}}

@@ -54,14 +54,14 @@ func (db Database) CreateDoc(doc Document) error {
 	return err
 }
 
-func (db Database) GetDocs(user string, archive bool, tag string) ([]Document,error) {
+func (db Database) GetDocs(user string, archive bool, tag []string) ([]Document,error) {
 	var res []Document
 	collection := db.connection.Database(db.name).Collection("documents")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	filter := bson.D{bson.E{"user",user},bson.E{"archive",archive}}
-	if tag != "" {
-		filter = bson.D{bson.E{"user",user},bson.E{"archive",archive},bson.E{"tags",tag}}
+	if len(tag) != 0 {
+		filter = bson.D{bson.E{"user",user},bson.E{"archive",archive},bson.E{"tags",bson.E{"$all",tag}}}
 	}
 	cursor, err := collection.Find(ctx,filter)
 	if err != nil {

@@ -75,7 +75,8 @@ func (c *Controller) Login(w http.ResponseWriter, r *http.Request, _ httprouter.
 }
 
 func (c *Controller) ActualDocs(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	docs, err := c.db.GetDocs(r.Context().Value("user").(db.User).Login,false,"")
+	filter := r.URL.Query()["filter"]
+	docs, err := c.db.GetDocs(r.Context().Value("user").(db.User).Login,false,filter)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		log.Print(err)
