@@ -69,6 +69,7 @@ func (c *Controller) UploadDoc(w http.ResponseWriter, r *http.Request, _ httprou
 	title := r.FormValue("title")
 	comment := r.FormValue("comment")
 	files := make([]string,0)
+	tags := r.Form["tags"]
 	if err := r.ParseMultipartForm(MAX_FILE_SIZE); err != nil {
 		http.Error(w, "Слишком большой файл", http.StatusBadRequest)
 		return
@@ -131,7 +132,7 @@ func (c *Controller) UploadDoc(w http.ResponseWriter, r *http.Request, _ httprou
 	//}
 	exe,_ := os.Executable()
 	ospath := filepath.Dir(exe)
-	doc := db.Document{Files:files,User:r.Context().Value("user").(db.User).Login,Title:title,Comment:comment,Date:time.Now().UTC()}
+	doc := db.Document{Files:files,User:r.Context().Value("user").(db.User).Login,Title:title,Comment:comment,Date:time.Now().UTC(),Tags:tags}
 	err := c.db.CreateDoc(doc)
 	if err != nil {
 		for _,name := range files {

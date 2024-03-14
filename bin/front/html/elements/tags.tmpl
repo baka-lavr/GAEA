@@ -1,4 +1,7 @@
 <div>
+    <button onclick="loadDocs('/{{$.URL}}','{{$.Id}}');" class="btn btn-outline-dark d-block">
+        {{.Name}}
+    </button>
     {{range .Tags}}
         <button onclick="loadDocs('/{{$.URL}}?filter={{.Id}}','{{$.Id}}');" class="btn btn-outline-dark d-block">
             {{.Name}}

@@ -41,7 +41,12 @@ func (c *Controller) View(w http.ResponseWriter, r *http.Request, page string, c
 }
 
 func (c *Controller) Main(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	c.View(w,r,"home",nil)
+	tags, err := c.db.GetTags()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	c.View(w,r,"home",tags)
 }
 
 func (c *Controller) DocPage(w http.ResponseWriter, r *http.Request, p httprouter.Params) {

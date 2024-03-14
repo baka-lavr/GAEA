@@ -11,6 +11,15 @@
       <label class="d-block">Комментарий
         <textarea name="comment" class="d-block mb-1" cols="50" rows="10"></textarea>
       </label>
+      <div>
+        {{range .Content}}
+        <button type="button" class="btn btn-outline-dark d-block" onclick="clickTag(self)">
+          <p>{{.Name}}</p>
+          <p disabled="true">&#10004; </p>
+          <input type="hidden" disabled="true" value="{{.Id}}" name="tags">
+        </button>
+        {{end}}
+      </div>
       <input type="file" name="document" class="btn btn-outline-dark d-block mb-1">
       <div id="dop_files">
         
@@ -29,7 +38,11 @@
         </h4>
         <hr class="my-1">
         <div id="mydocs_tags" class="pb-1">
-          
+          {{range .Content}}
+            <button onclick="loadDocs('/actual_docs?filter={{.Id}}','mydocs');" class="btn btn-outline-dark d-block">
+                {{.Name}}
+            </button>
+          {{end}}
         </div>
         <hr class="my-1">
         <div id="mydocs" class="pb-1">
@@ -44,8 +57,15 @@
           Активные документы
         </h4>
         <hr class="my-1">
+        <div>
+          {{range .Content}}
+            <button onclick="loadDocs('/head_docs?filter={{.Id}}','headdocs');" class="btn btn-outline-dark d-block">
+                {{.Name}}
+            </button>
+          {{end}}
+        </div>
+        <hr class="my-1">
         <div id="headdocs" class="pb-1">
-    
         </div>
       </div>
       <div class="bg-light mt-3 ps-2">
@@ -74,7 +94,7 @@
 
 
     $(document).ready(function(){
-      loadDocs("/tags?url=actual_docs&id=mydocs","mydocs_tags");
+      //loadDocs("/tags?url=actual_docs&id=mydocs","mydocs_tags");
       loadDocs("/actual_docs","mydocs");
       loadDocs("/head_docs","headdocs");
       loadDocs("/head_archive","headarch");
@@ -114,6 +134,12 @@
         }
       });
     });
+
+    function clickTag(element) {
+      console.log(element);
+      $(element).children().eq(1).attr("disabled",false)
+      $(element).children().eq(2).attr("disabled",false)
+    }
 
     function loadDocs(path, id) {
       $.ajax({
