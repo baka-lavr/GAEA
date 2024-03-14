@@ -59,9 +59,9 @@ func (db Database) GetDocs(user string, archive bool, tag []string) ([]Document,
 	collection := db.connection.Database(db.name).Collection("documents")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	filter := bson.D{bson.E{"user",user},bson.E{"archive",archive}}
+	filter := bson.M{"user":user,"archive":archive}
 	if len(tag) != 0 {
-		filter = bson.D{bson.E{"user",user},bson.E{"archive",archive},bson.E{"tags",bson.E{"$all",tag}}}
+		filter = bson.M{"user":user,"archive":archive,"tags":bson.M{"$all":tag}}
 	}
 	cursor, err := collection.Find(ctx,filter)
 	if err != nil {
